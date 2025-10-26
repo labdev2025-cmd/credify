@@ -1,5 +1,5 @@
 class CategoriasController < ApplicationController
-  before_action :set_categoria, only: %i[ show edit update destroy ]
+  before_action :set_categoria, only: %i[show edit update destroy]
 
   add_breadcrumb Categoria.model_name.human, :categorias_path
   add_breadcrumb I18n.t("breadcrumb.show"), :categoria_path, only: %i[show]
@@ -14,55 +14,38 @@ class CategoriasController < ApplicationController
   end
 
   def show; end
-
-  def new
-    @categoria = Categoria.new
-  end
-
+  def new; @categoria = Categoria.new; end
   def edit; end
 
   def create
     @categoria = Categoria.new(categoria_params)
-
-    respond_to do |format|
-      if @categoria.save
-        format.html { redirect_to @categoria, notice: t("messages.create.notice") }
-        format.json { render :show, status: :created, location: @categoria }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @categoria.errors, status: :unprocessable_entity }
-      end
+    if @categoria.save
+      redirect_to @categoria, notice: t("messages.create.notice")
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
   def update
-    respond_to do |format|
-      if @categoria.update(categoria_params)
-        format.html { redirect_to @categoria, notice: t("messages.update.notice") }
-        format.json { render :show, status: :ok, location: @categoria }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @categoria.errors, status: :unprocessable_entity }
-      end
+    if @categoria.update(categoria_params)
+      redirect_to @categoria, notice: t("messages.update.notice")
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     @categoria.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to categorias_path, status: :see_other, notice: t("messages.destroy.notice") }
-      format.json { head :no_content }
-    end
+    redirect_to categorias_path, status: :see_other, notice: t("messages.destroy.notice")
   end
 
   private
 
   def set_categoria
-    @categoria = Categoria.find(params.expect(:id))
+    @categoria = Categoria.find(params[:id])
   end
 
   def categoria_params
-    params.expect(categoria: [ :nome, :tipo ])
+    params.require(:categoria).permit(:nome, :tipo)
   end
 end

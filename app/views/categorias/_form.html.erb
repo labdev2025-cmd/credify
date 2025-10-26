@@ -2,17 +2,15 @@
   <%= form_for(@categoria, html: { class: 'ui form' }) do |f| %>
     <%= render partial: 'layouts/errors_messages', locals: { model: @categoria } %>
 
-
     <div class="required eight wide field">
       <%= f.label :nome %>
-      <%= f.text_field :nome, class: 'somenteLetras', maxlength: 100 %>
+      <%= f.text_field :nome, style: 'text-transform: uppercase;', class: 'somente-letras', maxlength: 100, placeholder: 'Ex: ALIMENTAÇÃO' %>
     </div>
 
     <div class="required eight wide field">
       <%= f.label :tipo %>
-      <%= f.text_field :tipo, class: 'somenteLetras', maxlength: 100 %>
+      <%= f.select :tipo, Categoria.tipos.keys.map { |t| [t.humanize.upcase, t] }, {}, class: 'ui dropdown' %>
     </div>
-
 
     <div class="actions">
       <%= link_to t('helpers.links.cancel'), categorias_path, class: 'ui button floated' %>
@@ -20,3 +18,12 @@
     </div>
   <% end %>
 </div>
+
+<%# === jQuery: bloqueia números no campo de nome === %>
+<script>
+    document.addEventListener("turbo:load", function() {
+        $('.somente-letras').on('input', function() {
+            this.value = this.value.replace(/[^A-Za-zÀ-ÿ\s]/g, '');
+        });
+    });
+</script>
