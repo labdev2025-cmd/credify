@@ -29,3 +29,20 @@
 
 en:
   hello: "Hello world"
+  helpers:
+    links:
+      cancel: ""
+      clear: ""
+      search: ""
+      show: ""
+      edit: ""
+      new: ""
+      destroy: ""
+    actions: ""
+    titles:
+      search_filter: ""
+  ransack:
+    search: ""
+  messages:
+    destroy:
+      confirm: ""
