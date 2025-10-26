@@ -1,0 +1,42 @@
+<div class="ui segment">
+  <%= form_for(@pessoa, html: { class: 'ui form' }) do |f| %>
+    <%= render partial: 'layouts/errors_messages', locals: { model: @pessoa } %>
+
+
+    <div class="required eight wide field">
+      <%= f.label :nome %>
+      <%= f.textarea :nome, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :apelido %>
+      <%= f.textarea :apelido, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :documento %>
+      <%= f.textarea :documento, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :email %>
+      <%= f.textarea :email, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :telefone %>
+      <%= f.textarea :telefone, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :ativo %>
+      <%= f.checkbox :ativo, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+
+    <div class="actions">
+      <%= link_to t('helpers.links.cancel'), pessoas_path, class: 'ui button floated' %>
+      <%= f.submit nil, class: 'ui green button' %>
+    </div>
+  <% end %>
+</div>

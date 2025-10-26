@@ -1,0 +1,33 @@
+<div id="<%= dom_id pessoa %>" class="ui green segment">
+
+  <p>
+    <strong><%= Pessoa.human_attribute_name :nome %>:</strong>
+    <%= pessoa.nome %>
+  </p>
+
+  <p>
+    <strong><%= Pessoa.human_attribute_name :apelido %>:</strong>
+    <%= pessoa.apelido %>
+  </p>
+
+  <p>
+    <strong><%= Pessoa.human_attribute_name :documento %>:</strong>
+    <%= pessoa.documento %>
+  </p>
+
+  <p>
+    <strong><%= Pessoa.human_attribute_name :email %>:</strong>
+    <%= pessoa.email %>
+  </p>
+
+  <p>
+    <strong><%= Pessoa.human_attribute_name :telefone %>:</strong>
+    <%= pessoa.telefone %>
+  </p>
+
+  <p>
+    <strong><%= Pessoa.human_attribute_name :ativo %>:</strong>
+    <%= pessoa.ativo %>
+  </p>
+
+</div>

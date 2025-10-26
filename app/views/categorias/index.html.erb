@@ -1,0 +1,69 @@
+<div style="margin-bottom: 10px;">
+  <%= link_to t('helpers.links.new'), new_categoria_path, class: 'ui right floated mini primary button', style: 'margin-top:5px;' %>
+  <h1 class="ui dividing header"><%= Categoria.model_name.human.pluralize %></h1>
+</div>
+
+<div class="ui styled fluid accordion">
+  <div class="title">
+    <i class="search icon"></i>
+    <%= t('helpers.titles.search_filter') %>
+  </div>
+  <div class="content">
+    <%= search_form_for @q, id: 'categoria_search', html: { class: 'ui tinny form' } do |f| %>
+      <div class="fields">
+
+        <div class="three wide field">
+          <%= f.label :nome %>
+          <%= f.search_field :nome_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :tipo %>
+          <%= f.search_field :tipo_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+      </div>
+      <div class="fields">
+        <div class="field">
+          <%= link_to t('helpers.links.clear'), categorias_path(clear: true), class: 'ui gray button' %>
+          <%= f.submit t('helpers.links.search'), class: "ui blue button", data: { tooltip: t('ransack.search'), inverted: '' } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="ui orange segment">
+  <table class="ui striped table">
+    <thead>
+      <tr>
+
+        <th><%= sort_link(@q, :nome, Categoria.human_attribute_name(:nome)) %></th>
+
+        <th><%= sort_link(@q, :tipo, Categoria.human_attribute_name(:tipo)) %></th>
+
+        <th class="center aligned" style="width: 5%;"><%= t('helpers.actions') %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% @categorias.each do |categoria| %>
+      <tr>
+
+        <td><%= categoria.nome %></td>
+
+        <td><%= categoria.tipo %></td>
+
+        <td style="width: 5%;">
+          <div class="ui icon buttons">
+            <%= link_to(content_tag(:i, nil, class: 'info circle icon'), categoria, class: 'ui button', data: { tooltip: t('helpers.links.show'), inverted: '' }) %>
+            <%= link_to content_tag(:i, nil, class: 'edit outline icon'), edit_categoria_path(categoria), class: 'ui button', data: { tooltip: t('helpers.links.edit'), inverted: '' } %>
+            <%= button_to content_tag(:i, nil, class: 'trash alternate outline red icon'), categoria, method: :delete, class: 'ui button', data: { controller: 'confirm-modal', action: 'confirm-modal#confirm', confirm_modal_message_value: t('messages.destroy.confirm'), tooltip: t('helpers.links.destroy'), inverted: '' } %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <%= render partial: 'layouts/pagination', locals: { collection: @categorias, url: categorias_path, limits: @limites, form_id: "categoria_search" } %>
+</div>

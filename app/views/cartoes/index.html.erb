@@ -1,0 +1,132 @@
+<div style="margin-bottom: 10px;">
+  <%= link_to t('helpers.links.new'), new_cartao_path, class: 'ui right floated mini primary button', style: 'margin-top:5px;' %>
+  <h1 class="ui dividing header"><%= Cartao.model_name.human.pluralize %></h1>
+</div>
+
+<div class="ui styled fluid accordion">
+  <div class="title">
+    <i class="search icon"></i>
+    <%= t('helpers.titles.search_filter') %>
+  </div>
+  <div class="content">
+    <%= search_form_for @q, id: 'cartao_search', html: { class: 'ui tinny form' } do |f| %>
+      <div class="fields">
+
+        <div class="three wide field">
+          <%= f.label :apelido %>
+          <%= f.search_field :apelido_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :emissor %>
+          <%= f.search_field :emissor_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :bandeira %>
+          <%= f.search_field :bandeira_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :final_cartao %>
+          <%= f.search_field :final_cartao_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :fechamento_dia %>
+          <%= f.search_field :fechamento_dia_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :vencimento_dia %>
+          <%= f.search_field :vencimento_dia_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :limite_total %>
+          <%= f.search_field :limite_total_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :ativo %>
+          <%= f.search_field :ativo_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :timezone %>
+          <%= f.search_field :timezone_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+      </div>
+      <div class="fields">
+        <div class="field">
+          <%= link_to t('helpers.links.clear'), cartoes_path(clear: true), class: 'ui gray button' %>
+          <%= f.submit t('helpers.links.search'), class: "ui blue button", data: { tooltip: t('ransack.search'), inverted: '' } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="ui orange segment">
+  <table class="ui striped table">
+    <thead>
+      <tr>
+
+        <th><%= sort_link(@q, :apelido, Cartao.human_attribute_name(:apelido)) %></th>
+
+        <th><%= sort_link(@q, :emissor, Cartao.human_attribute_name(:emissor)) %></th>
+
+        <th><%= sort_link(@q, :bandeira, Cartao.human_attribute_name(:bandeira)) %></th>
+
+        <th><%= sort_link(@q, :final_cartao, Cartao.human_attribute_name(:final_cartao)) %></th>
+
+        <th><%= sort_link(@q, :fechamento_dia, Cartao.human_attribute_name(:fechamento_dia)) %></th>
+
+        <th><%= sort_link(@q, :vencimento_dia, Cartao.human_attribute_name(:vencimento_dia)) %></th>
+
+        <th><%= sort_link(@q, :limite_total, Cartao.human_attribute_name(:limite_total)) %></th>
+
+        <th><%= sort_link(@q, :ativo, Cartao.human_attribute_name(:ativo)) %></th>
+
+        <th><%= sort_link(@q, :timezone, Cartao.human_attribute_name(:timezone)) %></th>
+
+        <th class="center aligned" style="width: 5%;"><%= t('helpers.actions') %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% @cartoes.each do |cartao| %>
+      <tr>
+
+        <td><%= cartao.apelido %></td>
+
+        <td><%= cartao.emissor %></td>
+
+        <td><%= cartao.bandeira %></td>
+
+        <td><%= cartao.final_cartao %></td>
+
+        <td><%= cartao.fechamento_dia %></td>
+
+        <td><%= cartao.vencimento_dia %></td>
+
+        <td><%= cartao.limite_total %></td>
+
+        <td><%= cartao.ativo %></td>
+
+        <td><%= cartao.timezone %></td>
+
+        <td style="width: 5%;">
+          <div class="ui icon buttons">
+            <%= link_to(content_tag(:i, nil, class: 'info circle icon'), cartao, class: 'ui button', data: { tooltip: t('helpers.links.show'), inverted: '' }) %>
+            <%= link_to content_tag(:i, nil, class: 'edit outline icon'), edit_cartao_path(cartao), class: 'ui button', data: { tooltip: t('helpers.links.edit'), inverted: '' } %>
+            <%= button_to content_tag(:i, nil, class: 'trash alternate outline red icon'), cartao, method: :delete, class: 'ui button', data: { controller: 'confirm-modal', action: 'confirm-modal#confirm', confirm_modal_message_value: t('messages.destroy.confirm'), tooltip: t('helpers.links.destroy'), inverted: '' } %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <%= render partial: 'layouts/pagination', locals: { collection: @cartoes, url: cartoes_path, limits: @limites, form_id: "cartao_search" } %>
+</div>

@@ -1,0 +1,105 @@
+<div style="margin-bottom: 10px;">
+  <%= link_to t('helpers.links.new'), new_pessoa_path, class: 'ui right floated mini primary button', style: 'margin-top:5px;' %>
+  <h1 class="ui dividing header"><%= Pessoa.model_name.human.pluralize %></h1>
+</div>
+
+<div class="ui styled fluid accordion">
+  <div class="title">
+    <i class="search icon"></i>
+    <%= t('helpers.titles.search_filter') %>
+  </div>
+  <div class="content">
+    <%= search_form_for @q, id: 'pessoa_search', html: { class: 'ui tinny form' } do |f| %>
+      <div class="fields">
+
+        <div class="three wide field">
+          <%= f.label :nome %>
+          <%= f.search_field :nome_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :apelido %>
+          <%= f.search_field :apelido_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :documento %>
+          <%= f.search_field :documento_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :email %>
+          <%= f.search_field :email_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :telefone %>
+          <%= f.search_field :telefone_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+        <div class="three wide field">
+          <%= f.label :ativo %>
+          <%= f.search_field :ativo_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+
+      </div>
+      <div class="fields">
+        <div class="field">
+          <%= link_to t('helpers.links.clear'), pessoas_path(clear: true), class: 'ui gray button' %>
+          <%= f.submit t('helpers.links.search'), class: "ui blue button", data: { tooltip: t('ransack.search'), inverted: '' } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="ui orange segment">
+  <table class="ui striped table">
+    <thead>
+      <tr>
+
+        <th><%= sort_link(@q, :nome, Pessoa.human_attribute_name(:nome)) %></th>
+
+        <th><%= sort_link(@q, :apelido, Pessoa.human_attribute_name(:apelido)) %></th>
+
+        <th><%= sort_link(@q, :documento, Pessoa.human_attribute_name(:documento)) %></th>
+
+        <th><%= sort_link(@q, :email, Pessoa.human_attribute_name(:email)) %></th>
+
+        <th><%= sort_link(@q, :telefone, Pessoa.human_attribute_name(:telefone)) %></th>
+
+        <th><%= sort_link(@q, :ativo, Pessoa.human_attribute_name(:ativo)) %></th>
+
+        <th class="center aligned" style="width: 5%;"><%= t('helpers.actions') %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% @pessoas.each do |pessoa| %>
+      <tr>
+
+        <td><%= pessoa.nome %></td>
+
+        <td><%= pessoa.apelido %></td>
+
+        <td><%= pessoa.documento %></td>
+
+        <td><%= pessoa.email %></td>
+
+        <td><%= pessoa.telefone %></td>
+
+        <td><%= pessoa.ativo %></td>
+
+        <td style="width: 5%;">
+          <div class="ui icon buttons">
+            <%= link_to(content_tag(:i, nil, class: 'info circle icon'), pessoa, class: 'ui button', data: { tooltip: t('helpers.links.show'), inverted: '' }) %>
+            <%= link_to content_tag(:i, nil, class: 'edit outline icon'), edit_pessoa_path(pessoa), class: 'ui button', data: { tooltip: t('helpers.links.edit'), inverted: '' } %>
+            <%= button_to content_tag(:i, nil, class: 'trash alternate outline red icon'), pessoa, method: :delete, class: 'ui button', data: { controller: 'confirm-modal', action: 'confirm-modal#confirm', confirm_modal_message_value: t('messages.destroy.confirm'), tooltip: t('helpers.links.destroy'), inverted: '' } %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <%= render partial: 'layouts/pagination', locals: { collection: @pessoas, url: pessoas_path, limits: @limites, form_id: "pessoa_search" } %>
+</div>

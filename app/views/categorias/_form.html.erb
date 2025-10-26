@@ -1,0 +1,22 @@
+<div class="ui segment">
+  <%= form_for(@categoria, html: { class: 'ui form' }) do |f| %>
+    <%= render partial: 'layouts/errors_messages', locals: { model: @categoria } %>
+
+
+    <div class="required eight wide field">
+      <%= f.label :nome %>
+      <%= f.textarea :nome, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :tipo %>
+      <%= f.textarea :tipo, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+
+    <div class="actions">
+      <%= link_to t('helpers.links.cancel'), categorias_path, class: 'ui button floated' %>
+      <%= f.submit nil, class: 'ui green button' %>
+    </div>
+  <% end %>
+</div>

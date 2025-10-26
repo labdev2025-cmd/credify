@@ -1,0 +1,57 @@
+<div class="ui segment">
+  <%= form_for(@cartao, html: { class: 'ui form' }) do |f| %>
+    <%= render partial: 'layouts/errors_messages', locals: { model: @cartao } %>
+
+
+    <div class="required eight wide field">
+      <%= f.label :apelido %>
+      <%= f.textarea :apelido, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :emissor %>
+      <%= f.textarea :emissor, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :bandeira %>
+      <%= f.textarea :bandeira, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :final_cartao %>
+      <%= f.text_field :final_cartao, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :fechamento_dia %>
+      <%= f.number_field :fechamento_dia, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :vencimento_dia %>
+      <%= f.number_field :vencimento_dia, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :limite_total %>
+      <%= f.text_field :limite_total, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :ativo %>
+      <%= f.checkbox :ativo, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+    <div class="required eight wide field">
+      <%= f.label :timezone %>
+      <%= f.textarea :timezone, class: 'somenteLetras', maxlength: 100 %>
+    </div>
+
+
+    <div class="actions">
+      <%= link_to t('helpers.links.cancel'), cartoes_path, class: 'ui button floated' %>
+      <%= f.submit nil, class: 'ui green button' %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,8 @@
+<h1 class="ui dividing header">
+  <%= Categoria.model_name.human %>
+</h1>
+
+<%= render @categoria %>
+
+<%= link_to t('helpers.links.back'), categorias_path, class: 'ui button white' %>
+<%= link_to t('helpers.links.edit'), edit_categoria_path(@categoria), class: 'ui green button' %>

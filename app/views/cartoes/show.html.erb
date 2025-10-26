@@ -1,0 +1,8 @@
+<h1 class="ui dividing header">
+  <%= Cartao.model_name.human %>
+</h1>
+
+<%= render @cartao %>
+
+<%= link_to t('helpers.links.back'), cartoes_path, class: 'ui button white' %>
+<%= link_to t('helpers.links.edit'), edit_cartao_path(@cartao), class: 'ui green button' %>
