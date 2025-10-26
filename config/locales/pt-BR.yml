@@ -375,6 +375,7 @@ pt-BR:
         not_found: 'Usuário não encontrado.'
     models:
       user: Usuário
+      cartao: Cartão
     attributes:
       user:
         cpf: CPF

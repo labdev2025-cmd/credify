@@ -19,7 +19,6 @@ class CartoesController < ApplicationController
 
   def create
     @cartao = Cartao.new(cartao_params)
-
     if @cartao.save
       redirect_to @cartao, notice: t("messages.create.notice")
     else

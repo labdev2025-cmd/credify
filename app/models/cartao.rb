@@ -7,22 +7,25 @@ class Cartao < ApplicationRecord
 
   validates :apelido, presence: true, uniqueness: true
   validates :emissor, :bandeira, :timezone, presence: true
-  validates :fechamento_dia, :vencimento_dia, presence: true,
-            numericality: { only_integer: true, in: 1..31 }
-  validates :ativo, inclusion: { in: [true, false] }
+  validates :fechamento_dia, :vencimento_dia,
+            presence: true,
+            numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 31 }
   validates :final_cartao,
-            format: { with: /\A\d{4}\z/, message: I18n.t("errors.messages.last_four_digits") },
-            allow_blank: true
+            allow_blank: true,
+            format: { with: /\A\d{4}\z/, message: I18n.t("errors.messages.last_four_digits") }
   validates :limite_total,
             numericality: { greater_than_or_equal_to: 0 },
             allow_blank: true
+  validates :ativo, inclusion: { in: [true, false] }
 
   validate :fechamento_e_vencimento_diferentes
 
   private
 
   def fechamento_e_vencimento_diferentes
-    if fechamento_dia.present? && vencimento_dia.present? && fechamento_dia == vencimento_dia
+    return if fechamento_dia.blank? || vencimento_dia.blank?
+
+    if fechamento_dia == vencimento_dia
       errors.add(:vencimento_dia, I18n.t("errors.messages.close_equal_due"))
     end
   end

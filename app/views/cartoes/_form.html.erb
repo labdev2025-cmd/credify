@@ -17,9 +17,9 @@
       <%= f.text_field :bandeira, style: 'text-transform: uppercase;' %>
     </div>
 
-    <div class="required eight wide field">
+    <div class="eight wide field">
       <%= f.label :final_cartao %>
-      <%= f.text_field :final_cartao, class: 'somente-numeros', inputmode: 'numeric', pattern: '\d*', maxlength: 4, placeholder: 'Últimos 4 dígitos' %>
+      <%= f.text_field :final_cartao, class: 'somente-numeros', inputmode: 'numeric', maxlength: 4, placeholder: 'Últimos 4 dígitos' %>
     </div>
 
     <div class="required eight wide field">
@@ -34,7 +34,7 @@
 
     <div class="required eight wide field">
       <%= f.label :limite_total %>
-      <%= f.text_field :limite_total, inputmode: 'decimal', placeholder: 'Ex: 5000.00' %>
+      <%= f.text_field :limite_total, class: 'somente-numeros', inputmode: 'decimal', placeholder: 'Ex: 5000.00' %>
     </div>
 
     <div class="field">
@@ -56,11 +56,11 @@
   <% end %>
 </div>
 
-<%# === jQuery: bloqueia letras onde deve haver apenas números === %>
+<%# === jQuery: impede digitar letras onde só deve ter números === %>
 <script>
     document.addEventListener("turbo:load", function() {
         $('.somente-numeros').on('input', function() {
-            this.value = this.value.replace(/\D/g, '');
+            this.value = this.value.replace(/[^0-9.,]/g, '');
         });
     });
 </script>
