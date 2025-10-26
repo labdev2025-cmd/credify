@@ -7,10 +7,10 @@ class CpfCnpjValidators
   INVALID_CNPJ_SEQUENCES = %w[00000000000000 11111111111111 22222222222222 33333333333333 44444444444444 55555555555555 66666666666666 77777777777777 88888888888888 99999999999999].freeze
 
   # Pesos usados no cálculo dos dígitos verificadores.
-  CPF_WEIGHTS_1 = [10, 9, 8, 7, 6, 5, 4, 3, 2].freeze
-  CPF_WEIGHTS_2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2].freeze
-  CNPJ_WEIGHTS_1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2].freeze
-  CNPJ_WEIGHTS_2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2].freeze
+  CPF_WEIGHTS_1 = [ 10, 9, 8, 7, 6, 5, 4, 3, 2 ].freeze
+  CPF_WEIGHTS_2 = [ 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 ].freeze
+  CNPJ_WEIGHTS_1 = [ 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 ].freeze
+  CNPJ_WEIGHTS_2 = [ 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 ].freeze
 
   # Valida um CPF.
   def self.check_cpf(cpf)
