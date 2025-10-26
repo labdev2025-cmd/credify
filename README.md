@@ -1,24 +1,51 @@
-# README
+# credify
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## 📋 Sobre
 
-Things you may want to cover:
+Projeto Rails criado com template personalizado.
 
-* Ruby version
+## 🚀 Tecnologias
 
-* System dependencies
+- Ruby 3.4.7
+- Rails 8.1.0
+- PostgreSQL
+- Fomantic UI
+- Devise (autenticação)
+- Kaminari (paginação)
+- Ransack (busca)
 
-* Configuration
+## 🔧 Instalação
 
-* Database creation
+```bash
+# Instalar dependências
+bundle install
 
-* Database initialization
+# Configurar banco de dados
+rails db:create
+rails db:migrate
 
-* How to run the test suite
+# Iniciar servidor
+rails server
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+## 📁 Estrutura do Projeto
 
-* Deployment instructions
+- `app/services/` - Serviços da aplicação
+- `app/javascript/fomantic/` - Arquivos do Fomantic UI
+- `config/locales/` - Arquivos de tradução (pt-BR)
 
-* ...
+## 🤝 Contribuindo
+
+1. Faça um fork do projeto
+2. Crie sua feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT.
+
+---
+
+Criado em 26/10/2025 usando rails_project_creator v2.0.0

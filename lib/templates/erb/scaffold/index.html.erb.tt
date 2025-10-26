@@ -1,0 +1,60 @@
+<div style="margin-bottom: 10px;">
+  <%%= link_to t('helpers.links.new'), new_<%= singular_table_name %>_path, class: 'ui right floated mini primary button', style: 'margin-top:5px;' %>
+  <h1 class="ui dividing header"><%%= <%= class_name %>.model_name.human.pluralize %></h1>
+</div>
+
+<div class="ui styled fluid accordion">
+  <div class="title">
+    <i class="search icon"></i>
+    <%%= t('helpers.titles.search_filter') %>
+  </div>
+  <div class="content">
+    <%%= search_form_for @q, id: '<%= singular_table_name %>_search', html: { class: 'ui tinny form' } do |f| %>
+      <div class="fields">
+        <%- attributes.each do |attribute| %>
+        <div class="three wide field">
+          <%%= f.label :<%= attribute.name %> %>
+          <%%= f.search_field :<%= attribute.name %>_cont, class: 'somenteLetras', maxlength: 100 %>
+        </div>
+        <%- end %>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <%%= link_to t('helpers.links.clear'), <%= plural_table_name %>_path(clear: true), class: 'ui gray button' %>
+          <%%= f.submit t('helpers.links.search'), class: "ui blue button", data: { tooltip: t('ransack.search'), inverted: '' } %>
+        </div>
+      </div>
+    <%% end %>
+  </div>
+</div>
+
+<div class="ui orange segment">
+  <table class="ui striped table">
+    <thead>
+      <tr>
+        <%- attributes.each do |attribute| %>
+        <th><%%= sort_link(@q, :<%= attribute.name %>, <%= class_name %>.human_attribute_name(:<%= attribute.name %>)) %></th>
+        <%- end %>
+        <th class="center aligned" style="width: 5%;"><%%= t('helpers.actions') %></th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <%% @<%= singular_table_name.pluralize %>.each do |<%= singular_table_name %>| %>
+      <tr>
+        <%- attributes.each do |attribute| %>
+        <td><%%= <%= singular_table_name %>.<%= attribute.name %> %></td>
+        <%- end %>
+        <td style="width: 5%;">
+          <div class="ui icon buttons">
+            <%%= link_to(content_tag(:i, nil, class: 'info circle icon'), <%= singular_table_name %>, class: 'ui button', data: { tooltip: t('helpers.links.show'), inverted: '' }) %>
+            <%%= link_to content_tag(:i, nil, class: 'edit outline icon'), edit_<%= singular_table_name %>_path(<%= singular_table_name %>), class: 'ui button', data: { tooltip: t('helpers.links.edit'), inverted: '' } %>
+            <%%= button_to content_tag(:i, nil, class: 'trash alternate outline red icon'), <%= singular_table_name %>, method: :delete, class: 'ui button', data: { controller: 'confirm-modal', action: 'confirm-modal#confirm', confirm_modal_message_value: t('messages.destroy.confirm'), tooltip: t('helpers.links.destroy'), inverted: '' } %>
+          </div>
+        </td>
+      </tr>
+    <%% end %>
+    </tbody>
+  </table>
+  <%%= render partial: 'layouts/pagination', locals: { collection: @<%= plural_table_name %>, url: <%= index_helper %>_path, limits: @limites, form_id: "<%= singular_table_name %>_search" } %>
+</div>

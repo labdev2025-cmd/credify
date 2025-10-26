@@ -1,0 +1,39 @@
+<div class="ui borderless menu" style="align-items: baseline;">
+  <%= paginate collection %>
+
+  <%
+    primeiro = params[:limit] * (params[:page].to_i - 1) + 1
+    primeiro = 1 if primeiro < 1
+  %>
+
+  <%
+    ultimo = params[:limit] * (params[:page].to_i - 1) + params[:limit]
+    ultimo = collection.total_count if ultimo > collection.total_count
+    ultimo = params[:limit] if params[:page].blank?
+    ultimo = collection.total_count if params[:limit] > collection.total_count
+  %>
+
+  <div class="right menu">
+    <div class="ui mini form" style="margin-top: 15px;">
+      <div class="inline fields">
+        <% if collection.total_count < 1 %>
+          <label>Nenhuma informação disponível</label>
+        <% else %>
+          <label><%= "#{t('views.pagination.records')}" %></label>
+          <label><%= "#{primeiro} - #{ultimo} / #{collection.total_count}" %></label>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="right menu">
+    <div class="ui mini form" style="margin-top: 11px;">
+      <div class="inline fields">
+        <label><%= "por página:" %></label>
+        <div class="field">
+          <%= select_tag :limit, options_for_select(limits, selected: params[:limit]), onchange: "$('##{form_id}').submit();", form: "#{form_id}" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

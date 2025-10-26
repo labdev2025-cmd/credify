@@ -1,0 +1,8 @@
+<div id="<%%= dom_id <%= singular_table_name %> %>" class="ui green segment">
+  <%- attributes.each do |attribute| %>
+  <p>
+    <strong><%%= <%= class_name %>.human_attribute_name :<%= attribute.name %> %>:</strong>
+    <%%= <%= singular_table_name %>.<%= attribute.name %> %>
+  </p>
+  <%- end %>
+</div>

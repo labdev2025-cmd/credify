@@ -33,3 +33,12 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+
+# Ignorar a pasta .idea do RubyMine
+.idea/
+
+# Ignorar backups
+*.bak
+
+# Ignorar logs do script
+rails_project_creator.log
