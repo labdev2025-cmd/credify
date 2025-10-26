@@ -46,3 +46,12 @@ en:
   messages:
     destroy:
       confirm: ""
+      notice: ""
+    create:
+      notice: ""
+    update:
+      notice: ""
+  breadcrumb:
+    show: ""
+    new: ""
+    edit: ""

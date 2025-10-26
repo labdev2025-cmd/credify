@@ -130,6 +130,8 @@ pt-BR:
       wrong_length: não possui o tamanho esperado (%{count} caracteres).
       form_errors: 'Não foi possível realizar esta ação:'
       quantity_exceeded: 'Limite excedido.'
+      only_numbers: "deve conter apenas números"
+      invalid_document: "não é um CPF ou CNPJ válido"
     template:
       body: ! 'Por favor, verifique o(s) seguinte(s) campo(s):'
       header:

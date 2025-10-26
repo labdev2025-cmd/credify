@@ -2,37 +2,37 @@
   <%= form_for(@pessoa, html: { class: 'ui form' }) do |f| %>
     <%= render partial: 'layouts/errors_messages', locals: { model: @pessoa } %>
 
-
     <div class="required eight wide field">
       <%= f.label :nome %>
-      <%= f.text_field :nome, class: 'somenteLetras', maxlength: 100 %>
+      <%= f.text_field :nome, style: 'text-transform: uppercase;' %>
     </div>
 
-    <div class="required eight wide field">
+    <div class="eight wide field">
       <%= f.label :apelido %>
-      <%= f.text_field :apelido, class: 'somenteLetras', maxlength: 100 %>
+      <%= f.text_field :apelido, style: 'text-transform: uppercase;' %>
     </div>
 
-    <div class="required eight wide field">
+    <div class="eight wide field">
       <%= f.label :documento %>
-      <%= f.text_field :documento, class: 'somenteLetras', maxlength: 100 %>
+      <%= f.text_field :documento, inputmode: 'numeric', pattern: '\d*', placeholder: 'Somente números', class: 'somente-numeros' %>
     </div>
 
-    <div class="required eight wide field">
+    <div class="eight wide field">
       <%= f.label :email %>
-      <%= f.text_field :email, class: 'somenteLetras', maxlength: 100 %>
+      <%= f.email_field :email, style: 'text-transform: uppercase;' %>
     </div>
 
-    <div class="required eight wide field">
+    <div class="eight wide field">
       <%= f.label :telefone %>
-      <%= f.text_field :telefone, class: 'somenteLetras', maxlength: 100 %>
+      <%= f.text_field :telefone, inputmode: 'numeric', pattern: '\d*', placeholder: '(99) 99999-9999', class: 'somente-numeros' %>
     </div>
 
-    <div class="required eight wide field">
-      <%= f.label :ativo %>
-      <%= f.checkbox :ativo, class: 'somenteLetras', maxlength: 100 %>
+    <div class="field">
+      <div class="ui toggle checkbox">
+        <%= f.check_box :ativo %>
+        <%= f.label :ativo %>
+      </div>
     </div>
-
 
     <div class="actions">
       <%= link_to t('helpers.links.cancel'), pessoas_path, class: 'ui button floated' %>
@@ -40,3 +40,13 @@
     </div>
   <% end %>
 </div>
+
+<%# === Bloqueia letras nos campos numéricos === %>
+<script>
+    document.addEventListener("turbo:load", function() {
+        // Bloqueia letras em campos com a classe .somente-numeros
+        $('.somente-numeros').on('input', function() {
+            this.value = this.value.replace(/\D/g, ''); // Remove qualquer caractere não numérico
+        });
+    });
+</script>

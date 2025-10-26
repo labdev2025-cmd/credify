@@ -11,8 +11,8 @@
   </p>
 
   <p>
-    <strong><%= Pessoa.human_attribute_name :documento %>:</strong>
-    <%= pessoa.documento %>
+    <strong><%= Pessoa.human_attribute_name(:documento) %>:</strong>
+    <%= formatar_documento(@pessoa.documento) %>
   </p>
 
   <p>
@@ -21,8 +21,8 @@
   </p>
 
   <p>
-    <strong><%= Pessoa.human_attribute_name :telefone %>:</strong>
-    <%= pessoa.telefone %>
+    <strong><%= Pessoa.human_attribute_name(:telefone) %>:</strong>
+    <%= formatar_telefone(@pessoa.telefone) %>
   </p>
 
   <p>
