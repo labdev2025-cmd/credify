@@ -6,7 +6,8 @@ class DespesaFixa < ApplicationRecord
   validates :descricao, :valor_mensal, :dia_lancamento, :inicio_em, presence: true
   validates :valor_mensal, numericality: { greater_than: 0 }
   validates :dia_lancamento, numericality: { only_integer: true, in: 1..31 }
-  validates :ativa, inclusion: { in: [true, false] }
+  validates :ativa, inclusion: { in: [ true, false ] }
+
   validate :periodo_valido
 
   private

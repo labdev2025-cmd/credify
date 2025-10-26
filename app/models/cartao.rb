@@ -8,6 +8,7 @@ class Cartao < ApplicationRecord
             numericality: { only_integer: true, in: 1..31 }
   validates :ativo, inclusion: { in: [ true, false ] }
   validates :timezone, presence: true
+
   validate :fechamento_e_vencimento_diferentes
 
   private

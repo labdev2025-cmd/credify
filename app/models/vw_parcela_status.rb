@@ -7,6 +7,12 @@ class VwParcelaStatus < ApplicationRecord
   belongs_to :despesa
   belongs_to :fatura, optional: true
 
+  enum :situacao_pagamento, {
+    em_aberto: "em_aberto",
+    parcialmente_quitada: "parcialmente_quitada",
+    quitada: "quitada"
+  }, prefix: true
+
   def readonly?
     true
   end

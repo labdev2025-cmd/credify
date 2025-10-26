@@ -6,6 +6,8 @@ class VwMovimento < ApplicationRecord
   belongs_to :cartao, optional: true
   belongs_to :fatura, optional: true
 
+  enum :tipo, { despesa: "despesa", receita: "receita" }, prefix: true
+
   def readonly?
     true
   end

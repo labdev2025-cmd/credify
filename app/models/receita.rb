@@ -5,7 +5,14 @@ class Receita < ApplicationRecord
   has_many :alocacoes_pagamentos, dependent: :destroy
   has_many :parcelas, through: :alocacoes_pagamentos, source: :despesa_parcela
 
+  enum :meio_pagamento, {
+    pix: "pix",
+    dinheiro: "dinheiro",
+    transferencia: "transferencia",
+    boleto: "boleto",
+    outro: "outro"
+  }, prefix: true, allow_nil: true
+
   validates :descricao, :data_recebimento, :valor, presence: true
   validates :valor, numericality: { greater_than: 0 }
-  validates :meio_pagamento, inclusion: { in: %w[pix dinheiro transferencia boleto outro], allow_nil: true }
 end
