@@ -1,5 +1,5 @@
 class CartoesController < ApplicationController
-  before_action :set_cartao, only: %i[ show edit update destroy ]
+  before_action :set_cartao, only: %i[show edit update destroy]
 
   add_breadcrumb Cartao.model_name.human, :cartoes_path
   add_breadcrumb I18n.t("breadcrumb.show"), :cartao_path, only: %i[show]
@@ -14,55 +14,43 @@ class CartoesController < ApplicationController
   end
 
   def show; end
-
-  def new
-    @cartao = Cartao.new
-  end
-
+  def new; @cartao = Cartao.new; end
   def edit; end
 
   def create
     @cartao = Cartao.new(cartao_params)
 
-    respond_to do |format|
-      if @cartao.save
-        format.html { redirect_to @cartao, notice: t("messages.create.notice") }
-        format.json { render :show, status: :created, location: @cartao }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @cartao.errors, status: :unprocessable_entity }
-      end
+    if @cartao.save
+      redirect_to @cartao, notice: t("messages.create.notice")
+    else
+      render :new, status: :unprocessable_entity
     end
   end
 
   def update
-    respond_to do |format|
-      if @cartao.update(cartao_params)
-        format.html { redirect_to @cartao, notice: t("messages.update.notice") }
-        format.json { render :show, status: :ok, location: @cartao }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @cartao.errors, status: :unprocessable_entity }
-      end
+    if @cartao.update(cartao_params)
+      redirect_to @cartao, notice: t("messages.update.notice")
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     @cartao.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to cartoes_path, status: :see_other, notice: t("messages.destroy.notice") }
-      format.json { head :no_content }
-    end
+    redirect_to cartoes_path, status: :see_other, notice: t("messages.destroy.notice")
   end
 
   private
 
   def set_cartao
-    @cartao = Cartao.find(params.expect(:id))
+    @cartao = Cartao.find(params[:id])
   end
 
   def cartao_params
-    params.expect(cartao: [ :apelido, :emissor, :bandeira, :final_cartao, :fechamento_dia, :vencimento_dia, :limite_total, :ativo, :timezone ])
+    params.require(:cartao).permit(
+      :apelido, :emissor, :bandeira, :final_cartao,
+      :fechamento_dia, :vencimento_dia, :limite_total,
+      :ativo, :timezone
+    )
   end
 end

@@ -55,3 +55,7 @@ en:
     show: ""
     new: ""
     edit: ""
+  errors:
+    messages:
+      last_four_digits: ""
+      close_equal_due: ""

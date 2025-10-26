@@ -132,6 +132,8 @@ pt-BR:
       quantity_exceeded: 'Limite excedido.'
       only_numbers: "deve conter apenas números"
       invalid_document: "não é um CPF ou CNPJ válido"
+      last_four_digits: "deve conter exatamente 4 dígitos numéricos"
+      close_equal_due: "não pode ser igual ao dia de fechamento"
     template:
       body: ! 'Por favor, verifique o(s) seguinte(s) campo(s):'
       header:
