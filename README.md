@@ -49,4 +49,3 @@ Este projeto está sob a licença MIT.
 ---
 
 Criado em 26/10/2025 usando rails_project_creator v2.0.0
-# credify
