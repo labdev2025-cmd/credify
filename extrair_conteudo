@@ -1,0 +1,466 @@
+#!/usr/bin/env bash
+# extrair_conteudo.sh — Extrai o conteúdo de arquivos para um arquivo texto
+# Compatível com bash >= 3.2 (mantendo portabilidade para macOS e Linux)
+# -----------------------------------------------------------------------------
+# PRINCIPAIS MELHORIAS:
+# - Separação clara de responsabilidades (parsing, validação, descoberta, filtro, processamento, saída).
+# - Remoção de loops duplicados envolvendo `find` (DRY).
+# - Nomes de variáveis e funções em português, descritivos e coerentes.
+# - Comentários extensos em português, explicando cada etapa.
+# - Ajuda (help) detalhada, com exemplos reais de uso e dicas.
+# - Mesma lógica essencial, sem perda de funcionalidades e sem quebras de compatibilidade.
+# - Tratamento consistente de exclusões, extensões, pasta base e caminhos relativos/absolutos.
+# - “Política de log” unificada (info/sucesso/aviso/erro/ignorado).
+# - Mantida a decisão de ignorar binários e arquivos sem permissão de leitura.
+# -----------------------------------------------------------------------------
+
+extrair_conteudo() {
+  # =============================[ Configuração Geral ]=============================
+  # Usamos apenas 'pipefail' para melhorar diagnósticos em pipelines
+  # (não utilizamos 'set -e' para não alterar o comportamento de continuação em erros).
+  set -o pipefail
+
+  # ===============================[ Ajuda/Manual ]================================
+  mostrar_ajuda() {
+    # Ajuda longa e detalhada, com exemplos práticos.
+    # Mantém compatibilidade com a opção --help/-h do script original.
+    cat <<'EOF'
+📁 extrair_conteudo — Extrai o conteúdo de arquivos texto para um arquivo .txt
+
+💡 O que faz?
+  Varre um diretório (atual ou informado) e gera um arquivo .txt contendo blocos de:
+    ==============================...
+    INICIO: /caminho/arquivo.ext
+    ==============================...
+    <conteúdo do arquivo>
+    ==============================...
+    FIM: /caminho/arquivo.ext
+    ==============================...
+
+  Binários são ignorados; arquivos sem permissão são avisados e pulados.
+
+📋 USO:
+  extrair_conteudo [OPÇÕES]                        # Processa todos os arquivos do diretório atual
+  extrair_conteudo [OPÇÕES] [ARQUIVOS...]          # Processa arquivos específicos do diretório atual
+  extrair_conteudo [OPÇÕES] [CAMINHO]              # Processa todos os arquivos do caminho informado
+  extrair_conteudo [OPÇÕES] [CAMINHO] [ARQS...]    # Processa arquivos específicos do caminho informado
+
+🎯 OPÇÕES:
+  -h, --help                   Mostra esta ajuda detalhada
+  -o, --output ARQUIVO         Define o arquivo de saída. Padrão: "conteudo_arquivos.txt" na pasta processada
+                               • Aceita caminho absoluto (/…/saida.txt) ou relativo à pasta processada (ex.: logs/saida.txt)
+  -r, --recursive              Varre recursivamente subdiretórios
+  --ext LISTA                  Filtra por extensões (apenas quando NÃO há arquivos específicos).
+                               Você pode:
+                                 --ext .rb,.erb,.html     # vírgulas separam itens
+                                 --ext .rb --ext .erb     # pode repetir a flag
+                               Observações:
+                                 - O ponto inicial é opcional (".rb" ~ "rb")
+                                 - Sem --ext => aceita TODAS as extensões
+  --exclude LISTA | -x LISTA   Exclui por nome/caminho/padrão (aplica-se em todos os modos).
+                               Aceita vírgulas e pode repetir a flag. Para globs, use aspas:
+                                 --exclude show.html.erb
+                                 --exclude '*/pessoas/show.html.erb'
+                                 --exclude '_*.jbuilder,*.bak'
+                               Como a exclusão é avaliada?
+                                 - Compara contra o basename (nome do arquivo) e contra o caminho completo.
+                                 - Também considera correspondência de caminho do tipo "*/padrao".
+  --sep-width N                Largura MÍNIMA do separador (ex.: 120). Se o cabeçalho/rodapé for maior, aumenta.
+  --sep-char PADRAO            Padrão do separador. Padrão: "="
+                               Exemplos: --sep-char '#' | --sep-char '=-' | --sep-char '─'
+
+🧭 COMO O SCRIPT DECIDE O QUE PROCESSAR?
+  1) Sem arquivos específicos:
+     • Se sem --ext            => Todos os arquivos do nível atual (ou recursivo com -r)
+     • Se com --ext            => Apenas os que combinarem com as extensões informadas
+     • Sempre aplica --exclude
+  2) Com arquivos específicos:
+     • Tenta cada nome diretamente, depois tenta "pasta_base/<nome>"
+     • Se -r, também procura recursivamente por basename correspondente
+     • Sempre aplica --exclude
+
+📊 SAÍDA:
+  - Cria um arquivo texto com o conteúdo concatenado dos arquivos processados.
+  - Mensagens de progresso são impressas no terminal.
+
+🧪 EXEMPLOS:
+  # 1) Todos os arquivos do diretório atual
+  extrair_conteudo
+
+  # 2) Somente .rb e .erb (nível atual)
+  extrair_conteudo --ext .rb,.erb
+
+  # 3) Recursivo em "app", excluindo temporários e .bak
+  extrair_conteudo -r app --exclude '*.tmp,*.bak'
+
+  # 4) Recursivo com saída customizada em subpasta
+  extrair_conteudo -r --output resultados/saida.txt
+
+  # 5) Somente arquivos específicos no diretório atual
+  extrair_conteudo Gemfile README.md
+
+  # 6) Arquivos específicos dentro de uma pasta, com busca recursiva de basenames
+  extrair_conteudo -r app pessoas_controller.rb application.rb
+
+  # 7) Separador personalizado
+  extrair_conteudo --sep-width 120 --sep-char '=-'
+
+  # 8) Excluindo por caminho completo
+  extrair_conteudo -r --exclude '*/pessoas/show.html.erb'
+
+⚠️ DICAS:
+  - Use aspas ao passar globs em --exclude para o shell não expandir antes.
+  - Binários são detectados e pulados automaticamente.
+  - O arquivo de saída nunca é incluído na própria extração.
+
+EOF
+  }
+
+  # ==========================[ Logging (mensagens) ]==============================
+  # Centraliza estilo e emojis; facilita manutenção e consistência.
+  log_info() { printf 'ℹ️  %s\n' "$*"; }
+  log_sucesso() { printf '✅ %s\n' "$*"; }
+  log_aviso() { printf '⚠️  %s\n' "$*"; }
+  log_erro() { printf '❌ %s\n' "$*"; }
+  log_ignorado() { printf '🚫 %s\n' "$*"; }
+
+  # ===========================[ Variáveis de estado ]=============================
+  # Todas locais ao escopo da função principal.
+  local recursivo=false       # -r / --recursive
+  local -a lista_extensoes=() # --ext (somente quando não há arquivos específicos)
+  local -a lista_exclusoes=() # --exclude / -x
+  local nome_saida=""         # -o / --output (pode ser relativo ou absoluto)
+  local -a posicionais=()     # argumentos posicionais (pasta base e/ou arquivos)
+  local largura_sep=0         # 0 = adaptativo; >0 = largura mínima
+  local padrao_sep="="        # padrão do separador
+
+  # ===========================[ Parse de argumentos ]=============================
+  # Mantém sem uso de getopt para compatibilidade ampla (bash <= 3.2).
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    -h | --help | -help | --h)
+      mostrar_ajuda
+      return 0
+      ;;
+    -r | --recursive)
+      recursivo=true
+      shift
+      ;;
+    -o | --output)
+      [[ -n "${2-}" ]] || {
+        log_erro "Faltou o nome após $1"
+        return 1
+      }
+      nome_saida="$2"
+      shift 2
+      ;;
+    --ext)
+      [[ -n "${2-}" ]] || {
+        log_erro "Faltou a lista após --ext"
+        return 1
+      }
+      local IFS=',' item
+      for item in $2; do
+        item="${item//[[:space:]]/}"
+        [[ -z "$item" ]] && continue
+        [[ "$item" == .* ]] || item=".$item" # garante ponto inicial
+        lista_extensoes+=("$item")
+      done
+      shift 2
+      ;;
+    --exclude | -x)
+      [[ -n "${2-}" ]] || {
+        log_erro "Faltou a lista após $1"
+        return 1
+      }
+      local IFS=',' padrao
+      for padrao in $2; do
+        padrao="${padrao//[[:space:]]/}"
+        [[ -z "$padrao" ]] && continue
+        lista_exclusoes+=("$padrao")
+      done
+      shift 2
+      ;;
+    --sep-width)
+      [[ -n "${2-}" ]] || {
+        log_erro "Faltou o número após --sep-width"
+        return 1
+      }
+      [[ "$2" =~ ^[0-9]+$ ]] || {
+        log_erro "--sep-width precisa ser inteiro não-negativo"
+        return 1
+      }
+      largura_sep="$2"
+      shift 2
+      ;;
+    --sep-char)
+      [[ -n "${2-}" ]] || {
+        log_erro "Faltou o padrão após --sep-char"
+        return 1
+      }
+      padrao_sep="$2"
+      shift 2
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      log_aviso "Opção desconhecida: $1"
+      printf "    Use --help para ver o uso.\n"
+      return 1
+      ;;
+    *)
+      posicionais+=("$1")
+      shift
+      ;;
+    esac
+  done
+  # Se ainda houver argumentos (após '--'), adiciona aos posicionais
+  if [[ $# -gt 0 ]]; then posicionais+=("$@"); fi
+
+  # ==========================[ Pasta base & específicos ]=========================
+  # Regras:
+  # - Se nenhum posicional => pasta base = diretório atual
+  # - Se o primeiro posicional for diretório => é a pasta base; os demais são específicos
+  # - Caso contrário => pasta base = atual; todos os posicionais são específicos
+  local pasta_base
+  local -a arquivos_especificos=()
+  if [[ ${#posicionais[@]} -eq 0 ]]; then
+    pasta_base="$(pwd)"
+  else
+    if [[ -d "${posicionais[0]}" ]]; then
+      pasta_base="${posicionais[0]}"
+      posicionais=("${posicionais[@]:1}")
+      arquivos_especificos=("${posicionais[@]}")
+    else
+      pasta_base="$(pwd)"
+      arquivos_especificos=("${posicionais[@]}")
+    fi
+  fi
+
+  if [[ ! -d "$pasta_base" ]]; then
+    log_erro "A pasta '$pasta_base' não existe!"
+    printf "💡 Use 'extrair_conteudo --help' para ver as opções de uso\n"
+    return 1
+  fi
+
+  # ===========================[ Resolução do arquivo de saída ]===================
+  # Regras:
+  # - Se nome fornecido e for absoluto ou incluir '/', respeita-se o caminho.
+  # - Senão, grava em pasta_base/nome
+  # - Default: pasta_base/conteudo_arquivos.txt
+  local caminho_saida
+  if [[ -n "$nome_saida" ]]; then
+    if [[ "$nome_saida" = /* || "$nome_saida" == */* ]]; then
+      caminho_saida="$nome_saida"
+    else
+      caminho_saida="$pasta_base/$nome_saida"
+    fi
+  else
+    caminho_saida="$pasta_base/conteudo_arquivos.txt"
+  fi
+  mkdir -p -- "$(dirname -- "$caminho_saida")"
+  rm -f -- "$caminho_saida" 2>/dev/null || true
+
+  # ===============================[ Utilitários ]=================================
+  # Caminho absoluto, portável entre macOS/Linux sem 'realpath'/'readlink -f'
+  caminho_absoluto() {
+    local p="$1"
+    (cd "$(dirname -- "$p")" 2>/dev/null && printf '%s/%s\n' "$(pwd -P)" "$(basename -- "$p")")
+  }
+
+  # Gera uma linha separadora com largura N, preenchida por um padrão (1+ chars)
+  linha_separadora() {
+    local largura="$1" padrao="$2"
+    if [[ ${#padrao} -eq 1 ]]; then
+      # Padrão unitário — mais performático
+      printf '%*s' "$largura" '' | tr ' ' "$padrao"
+    else
+      # Padrão com mais de 1 char — repetimos até o tamanho desejado
+      local out=""
+      while [[ ${#out} -lt "$largura" ]]; do out="$out$padrao"; done
+      printf '%s\n' "${out:0:$largura}"
+    fi
+  }
+
+  # Calcula a largura efetiva do separador com base no cabeçalho/rodapé e largura mínima
+  calcular_largura_separador() {
+    local cab="$1" rod="$2"
+    local lcab=${#cab} lrod=${#rod}
+    local min="$largura_sep" # largura mínima solicitada
+    ((lcab > min)) && min="$lcab"
+    ((lrod > min)) && min="$lrod"
+    printf '%s\n' "$min"
+  }
+
+  # Match de extensão (se lista vazia => aceita tudo)
+  combina_extensao() {
+    local arquivo="$1" ext
+    if [[ ${#lista_extensoes[@]} -eq 0 ]]; then return 0; fi
+    for ext in "${lista_extensoes[@]}"; do
+      [[ "$arquivo" == *"$ext" ]] && return 0
+    done
+    return 1
+  }
+
+  # Verifica se deve excluir o arquivo com base nos padrões fornecidos.
+  # Retorna 0 (verdadeiro) se DEVE EXCLUIR; retorna 1 se NÃO deve.
+  deve_excluir() {
+    local caminho="$1" base="${1##*/}" padrao
+    for padrao in "${lista_exclusoes[@]}"; do
+      # Aceita padrões/globs; compara com basename e com caminho completo.
+      if [[ "$base" == "$padrao" || "$caminho" == "$padrao" || "$caminho" == */"$padrao" ]]; then
+        return 0
+      fi
+    done
+    return 1
+  }
+
+  # =============================[ Processamento ]=================================
+  local total_processados=0
+
+  # Processa um arquivo individual: valida, constrói separadores, apenda ao arquivo de saída.
+  processar_arquivo() {
+    local arquivo="$1"
+    [[ -f "$arquivo" ]] || return 0
+
+    # Evita processar o próprio arquivo de saída (mesmo se via relativo)
+    if [[ "$(caminho_absoluto "$arquivo")" == "$(caminho_absoluto "$caminho_saida")" ]]; then
+      return 0
+    fi
+
+    if deve_excluir "$arquivo"; then
+      log_ignorado "Ignorado (--exclude): $(basename -- "$arquivo")"
+      return 0
+    fi
+
+    [[ -r "$arquivo" ]] || {
+      log_aviso "Sem permissão: $(basename -- "$arquivo")"
+      return 0
+    }
+
+    # Detecta binário — `grep -Iq .` retorna sucesso para arquivo texto
+    if ! grep -Iq . -- "$arquivo"; then
+      log_aviso "Ignorando binário: $(basename -- "$arquivo")"
+      return 0
+    fi
+
+    local caminho_abs
+    caminho_abs="$(caminho_absoluto "$arquivo")"
+    local cabecalho="INICIO: $caminho_abs"
+    local rodape="FIM: $caminho_abs"
+    local largura_efetiva
+    largura_efetiva="$(calcular_largura_separador "$cabecalho" "$rodape")"
+    local separador
+    separador="$(linha_separadora "$largura_efetiva" "$padrao_sep")"
+
+    {
+      printf '%s\n' "$separador"
+      printf '%s\n' "$cabecalho"
+      printf '%s\n' "$separador"
+      cat -- "$arquivo"
+      printf '\n'
+      printf '%s\n' "$separador"
+      printf '%s\n' "$rodape"
+      printf '%s\n' "$separador"
+      printf '\n'
+    } >>"$caminho_saida"
+
+    ((total_processados++))
+    log_sucesso "Processado: $(basename -- "$arquivo")"
+  }
+
+  # Descobre e itera arquivos quando NÃO há uma lista específica:
+  # Unifica a lógica recursiva e não-recursiva, evitando duplicação.
+  varrer_pasta() {
+    local alvo="$1"  # pasta base
+    local f
+    if $recursivo; then
+      log_info "Processando RECURSIVAMENTE em: $alvo"
+      # Sem pipe! O while roda no shell atual; o find alimenta via redireção.
+      while IFS= read -r -d $'\0' f; do
+        deve_excluir "$f" && { log_ignorado "Ignorado (--exclude): $(basename -- "$f")"; continue; }
+        combina_extensao "$f" || continue
+        processar_arquivo "$f"
+      done < <(find "$alvo" -type f -print0)
+    else
+      log_info "Processando TODOS os arquivos em: $alvo"
+      while IFS= read -r -d $'\0' f; do
+        deve_excluir "$f" && { log_ignorado "Ignorado (--exclude): $(basename -- "$f")"; continue; }
+        combina_extensao "$f" || continue
+        processar_arquivo "$f"
+      done < <(find "$alvo" -maxdepth 1 -type f -print0)
+    fi
+  }
+
+  # Trata a lista de arquivos específicos — mantém semântica original:
+  # - Procura pelo nome literal no cwd e em pasta_base
+  # - Se recursivo, também busca por basename via find, podendo trazer múltiplos matches
+  processar_especificos() {
+    local base="$1"
+    shift
+    local -a nomes=("$@")
+    local nome f encontrado
+
+    log_info "Processando arquivos específicos em: $base"
+    for nome in "${nomes[@]}"; do
+      encontrado=false
+
+      # Candidato 1: caminho passado literalmente
+      if [[ -f "$nome" ]] && ! deve_excluir "$nome"; then
+        processar_arquivo "$nome"
+        encontrado=true
+      fi
+
+      # Candidato 2: dentro da pasta base
+      if ! $encontrado && [[ -f "$base/$nome" ]] && ! deve_excluir "$base/$nome"; then
+        processar_arquivo "$base/$nome"
+        encontrado=true
+      fi
+
+      # Candidato 3: busca recursiva por basename (se -r)
+      if $recursivo && ! $encontrado; then
+        local padrao_busca
+        padrao_busca="$(basename -- "$nome")"
+        # -name casa apenas basename; -print0 para segurança
+        while IFS= read -r -d $'\0' f; do
+          deve_excluir "$f" && continue
+          processar_arquivo "$f"
+          encontrado=true
+        done < <(find "$base" -type f -name "$padrao_busca" -print0)
+      fi
+
+      $encontrado || log_aviso "'$nome' não encontrado (ou excluído por --exclude)"
+    done
+  }
+
+  # ===============================[ Execução ]====================================
+  if [[ ${#arquivos_especificos[@]} -eq 0 ]]; then
+    # Sem lista específica: varre a pasta (com ou sem recursão)
+    varrer_pasta "$pasta_base"
+  else
+    # Com lista específica: processa conforme regras acima
+    processar_especificos "$pasta_base" "${arquivos_especificos[@]}"
+  fi
+
+  # ===============================[ Resultado ]===================================
+  if [[ "$total_processados" -eq 0 ]]; then
+    log_erro "Nenhum arquivo foi processado"
+    rm -f -- "$caminho_saida" 2>/dev/null || true
+    printf "💡 Use 'extrair_conteudo --help' para ver as opções de uso\n"
+  else
+    printf '🎉 Concluído! %s arquivo(s) processado(s)\n' "$total_processados"
+    printf '📄 Conteúdo salvo em: %s\n' "$caminho_saida"
+  fi
+
+  # ==============================[ Limpeza de escopo ]============================
+  # Remove funções auxiliares do escopo global do shell do usuário.
+  unset -f \
+    mostrar_ajuda log_info log_sucesso log_aviso log_erro log_ignorado \
+    caminho_absoluto linha_separadora calcular_largura_separador \
+    combina_extensao deve_excluir processar_arquivo varrer_pasta processar_especificos
+}
+
+# Ponto de entrada — chama a função principal com os argumentos passados
+extrair_conteudo "$@"
