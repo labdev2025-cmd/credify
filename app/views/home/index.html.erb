@@ -1,0 +1,89 @@
+<div class="ui container" style="margin-top: 2em;">
+
+  <h1 class="ui header">
+    <i class="chart pie blue icon"></i>
+    <div class="content">
+      Dashboard Credify
+      <div class="sub header">Visão geral do sistema de gerenciamento</div>
+    </div>
+  </h1>
+
+  <div class="ui divider"></div>
+
+  <div class="ui segment">
+    <h3 class="ui header">Visão Geral</h3>
+    <div class="ui three stackable statistics">
+
+      <div class="statistic">
+        <div class="value">
+          <i class="users icon"></i>
+          <%= @total_pessoas %>
+        </div>
+        <div class="label">
+          Pessoas
+        </div>
+      </div>
+
+      <div class="statistic">
+        <div class="value">
+          <i class="credit card outline icon"></i>
+          <%= @total_cartoes %>
+        </div>
+        <div class="label">
+          Cartões
+        </div>
+      </div>
+
+      <div class="statistic">
+        <div class="value">
+          <i class="tags icon"></i>
+          <%= @total_categorias %>
+        </div>
+        <div class="label">
+          Categorias
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="ui segment">
+    <h3 class="ui header">Ações Rápidas</h3>
+    <div class="ui three stackable cards">
+
+      <%#
+        Nota: De acordo com seu routes.rb, o 'scope :credify'
+        apenas prefixa a URL, não o nome do helper.
+        Por isso, usamos 'pessoas_path' e não 'credify_pessoas_path'.
+      %>
+      <a class="ui blue card" href="<%= pessoas_path %>">
+        <div class="content">
+          <div class="header"><i class="users icon"></i> Gerenciar Pessoas</div>
+          <div class="description">
+            Adicionar, editar e visualizar pessoas cadastradas.
+          </div>
+        </div>
+      </a>
+
+      <a class="ui green card" href="<%= cartoes_path %>">
+        <div class="content">
+          <div class="header"><i class="credit card icon"></i> Gerenciar Cartões</div>
+          <div class="description">
+            Cadastrar novos cartões de crédito e seus limites.
+          </div>
+        </div>
+      </a>
+
+      <a class="ui orange card" href="<%= categorias_path %>">
+        <div class="content">
+          <div class="header"><i class="tags icon"></i> Gerenciar Categorias</div>
+          <div class="description">
+            Organizar as categorias de despesas e receitas.
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+</div>

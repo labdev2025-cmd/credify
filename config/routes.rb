@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
+  get "home/index"
   scope :credify do
+    root "home#index"
     resources :categorias
     resources :cartoes
     resources :pessoas
