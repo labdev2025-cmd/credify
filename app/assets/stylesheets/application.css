@@ -8,3 +8,32 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+
+/*
+ * Sticky Footer com Flexbox
+ * --------------------------------------------------
+ */
+
+/* Garante que o html e o body permitam expansão total */
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    /* Garante que o body tenha no mínimo a altura da janela */
+    min-height: 100vh;
+}
+
+/* Faz o conteúdo principal crescer para preencher o espaço
+   vazio, empurrando o rodapé para baixo */
+.main-content {
+    flex-grow: 1;
+}
+
+/* Garante que o rodapé não encolha (boa prática) */
+.ui.footer.segment {
+    flex-shrink: 0;
+}
